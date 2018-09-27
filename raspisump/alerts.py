@@ -32,7 +32,8 @@ configs = {'email_to': config.get('email', 'email_to'),
            'smtp_server': config.get('email', 'smtp_server'),
            'username': config.get('email', 'username'),
            'password': config.get('email', 'password'),
-           'unit': config.get('pit', 'unit')
+           'unit': config.get('pit', 'unit'),
+           'pit_depth': config.get('pit', 'pit_depth')
            }
 
 # If item in raspisump.conf add to configs dict above.  If not then provide
@@ -65,6 +66,8 @@ def email_content(water_depth):
 
     time_of_day = time.strftime('%I:%M%P %Z')
     unit_type = unit_types()
+    pit_depth = int(configs['pit_depth'])
+    water_gap = round((pit_depth-water_depth), 1)  # distance between the top of the pit and the water level
     email_contents = {'subject_high': 'Subject: Sump Pump Alert!',
                       'subject_low': 'Subject: Low Water Level Alert!',
                       'message_high': 'Critical! The sump pit water level is',
@@ -83,7 +86,8 @@ def email_content(water_depth):
         "To: {}".format(configs['email_to']),
         "{}".format(subject),
         "",
-        "{} - {} {} {}.".format(time_of_day, message, str(water_depth), unit_type),
+        "{} - {} {} {}, {} {} from floor level.".format(time_of_day, message, str(water_depth), unit_type, str(water_gap), unit_type),
+        "Sump pit depth is {} inches".format(configs['pit_depth']),
         "Next alert in {} minutes".format(configs['alert_interval']),
         )
         )
